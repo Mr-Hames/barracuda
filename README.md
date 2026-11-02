@@ -119,7 +119,7 @@ The checks are done by a script, so the result is the same no matter which AI mo
 ```bash
 python scripts/guard.py --task task.txt --extract-only > contract.json   # see how the task was read
 python scripts/guard.py --contract contract.json report.docx             # check against an edited list
-python -m unittest discover tests                                         # unit and stress tests
+python -m unittest discover tests                                         # unit and stress tests (see CONTRIBUTING.md)
 python bench/generate.py --n 50 --seed 7 && python bench/evaluate.py      # benchmark (needs pymupdf, pillow)
 python tests/hard_phrasings_2.py                                          # real-life phrasings
 ```
