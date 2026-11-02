@@ -16,7 +16,7 @@ It works with PDF, Word (DOCX), PowerPoint (PPTX), Excel (XLSX) and ZIP archives
 
 | You write | What it reads from the assignment | What you get |
 |---|---|---|
-| `Check my coursework against this task` + task.txt, thesis.docx | 15 to 20 pages, Times New Roman 14, left margin 30 mm, sections | Each mismatch with the number it found, e.g. "13 pages (need ≥15)" |
+| `Check my coursework against this task` + task.txt, thesis.docx | 15 to 20 pages, Times New Roman 14, left margin 30 mm, sections | Each mismatch with the number it found, e.g. "13 pages (need ≥15 pages)" |
 | `Is this ready to send to the client?` + brief from an email, deck.pptx, offer.pdf | PDF only, at most 10 slides, file name pattern, no comments | Wrong format, extra slides, a forgotten reviewer comment |
 | `Перевір архів перед здачею` + ZIP with the project | Required files, size limit, no junk | `__MACOSX`, `.DS_Store`, a missing file inside the archive |
 | `Проверь таблицу по заданию` + calc.xlsx | Required sheet names, no formula errors | `#DIV/0!` with the exact sheet and cell |
