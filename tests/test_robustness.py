@@ -94,6 +94,27 @@ class BadFiles(unittest.TestCase):
         r = run("Submit a ZIP with a Word document (DOCX) of at least 10 words.", [z])
         self.assertNotEqual(statuses(r).get("words"), "pass")
 
+    def test_zip_bomb_is_stopped(self):
+        import readers
+        z = os.path.join(self.dir, "bomb.zip")
+        with zipfile.ZipFile(z, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("big.docx", b"\0" * (8 * 1024 * 1024))  # 8 MB of zeros packs to a few KB
+        old = readers.MAX_UNPACKED_BYTES
+        readers.MAX_UNPACKED_BYTES = 1024 * 1024  # pretend the limit is 1 MB
+        try:
+            r = run("Submit a ZIP with a Word document (DOCX) of at least 10 words.", [z])
+        finally:
+            readers.MAX_UNPACKED_BYTES = old
+        self.assertNotEqual(statuses(r).get("words"), "pass")
+        self.assertIn("zip bomb", " ".join(e for x in r["results"] for e in x["evidence"]))
+
+    def test_sibling_folder_traversal(self):
+        z = os.path.join(self.dir, "evil2.zip")
+        with zipfile.ZipFile(z, "w") as zf:
+            zf.writestr("../guard_x/escaped.txt", b"x")
+        run("Submit a ZIP archive.", [z])
+        self.assertFalse(os.path.exists(os.path.join(tempfile.gettempdir(), "guard_x", "escaped.txt")))
+
     def test_nested_zip(self):
         inner = os.path.join(self.dir, "inner.zip")
         with zipfile.ZipFile(inner, "w") as zf:

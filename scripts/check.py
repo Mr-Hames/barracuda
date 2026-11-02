@@ -65,7 +65,8 @@ def per_file(req, f):
                    else "page count does not apply to this file type")
             return "unverified", f"{name}: {why}"
         ok = in_range(pages, req)
-        return ("pass" if ok else "fail"), f"{name}: {pages} pages (need {fmt_range(req.get('min'), req.get('max'), 'pages')})"
+        need = fmt_range(req.get("min"), req.get("max"), "pages")
+        return ("pass" if ok else "fail"), f"{name}: {pages} pages (need {need})"
     if t == "slides":
         n = f.get("slides")
         if n is None:

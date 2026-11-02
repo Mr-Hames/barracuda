@@ -99,13 +99,14 @@ def run():
             risky = [i for i in items if i["type"] in CHECKABLE]
             listed = any(i["type"] == "unverified" for i in items)
             good = listed and not risky
-            why = f"checkable items {[(i['type'], {k: v for k, v in i.items() if k in ('min', 'max', 'value')}) for i in risky]}" \
-                if risky else "not listed as manual check"
+            shown = [(i["type"], {k: v for k, v in i.items() if k in ("min", "max", "value")}) for i in risky]
+            why = f"checkable items {shown}" if risky else "not listed as manual check"
         else:
             missing = [(t, p) for t, p in expected
                        if not any(i["type"] == t and matches(i, p) for i in items)]
             good = not missing
-            why = f"missing {missing}; got {[(i['type'], {k: v for k, v in i.items() if k not in ('id', 'source', 'type')}) for i in items]}"
+            got = [(i["type"], {k: v for k, v in i.items() if k not in ("id", "source", "type")}) for i in items]
+            why = f"missing {missing}; got {got}"
         if good:
             ok += 1
         else:

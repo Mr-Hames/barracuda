@@ -1,0 +1,33 @@
+[project]
+name = "barracuda-guard"
+version = "0.1.0"
+description = "Check PDF, DOCX, PPTX, XLSX and ZIP deliverables against a plain-text assignment. Unverifiable requirements are never reported as met."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Mr.Hames" }]
+requires-python = ">=3.9"
+dependencies = [
+    "pdfplumber>=0.10",
+    "python-docx>=1.1",
+    "python-pptx>=0.6.21",
+    "openpyxl>=3.1",
+    "defusedxml>=0.7",  # openpyxl uses it automatically against XML bombs
+]
+
+[project.optional-dependencies]
+bench = ["pymupdf", "pillow"]
+
+[project.urls]
+Homepage = "https://github.com/Mr-Hames/barracuda"
+Issues = "https://github.com/Mr-Hames/barracuda/issues"
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# assignment phrase templates: long string literals read better unbroken
+"bench/generate.py" = ["E501"]

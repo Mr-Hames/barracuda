@@ -4,7 +4,6 @@ Every reader returns a dict. A value of None means "could not be determined" —
 as unverified, never as passed.
 """
 import collections
-import io
 import logging
 import os
 import re
@@ -22,6 +21,8 @@ PLACEHOLDER_RE = re.compile(
 ZIP_JUNK_RE = re.compile(r"(^|/)(__MACOSX/|\.DS_Store$|Thumbs\.db$|desktop\.ini$|~\$|\._)", re.I)
 FORMULA_ERRORS = {"#REF!", "#DIV/0!", "#VALUE!", "#NAME?", "#N/A", "#NUM!", "#NULL!", "#SPILL!", "#CALC!"}
 DOC_EXTS = {"pdf", "docx", "pptx", "xlsx"}
+MAX_UNPACKED_BYTES = 1024 * 1024 * 1024  # 1 GB unpacked per submission, archives inside archives included
+MAX_ZIP_ENTRIES = 2000
 IMAGE_RE = re.compile(r"\.(png|jpe?g|gif|bmp|tiff?|emf|wmf|svg|webp|heic)$", re.I)  # not embedded .bin/OLE
 
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
@@ -251,7 +252,7 @@ def read_xlsx(path):
     formulas = openpyxl.load_workbook(path, data_only=False, read_only=True)
     try:
         f["sheets"] = list(values.sheetnames)
-        texts, errors, empty, uncalculated, comments = [], [], [], 0, 0
+        texts, errors, empty, uncalculated = [], [], [], 0
         for name in values.sheetnames:
             ws_v, ws_f = values[name], formulas[name]
             filled = 0
@@ -308,34 +309,52 @@ def read_file(path, name=None):
     return f
 
 
-def read_zip(path, depth=0):
+def _copy_limited(src, dst, limit):
+    """Copy at most `limit` bytes; the declared size in a ZIP header can lie (zip bombs)."""
+    copied = 0
+    while True:
+        chunk = src.read(1024 * 1024)
+        if not chunk:
+            return copied
+        copied += len(chunk)
+        if copied > limit:
+            raise ValueError("unpacks to more than the safety limit (possible zip bomb)")
+        dst.write(chunk)
+
+
+def read_zip(path, depth=0, budget=None):
     f = {"name": os.path.basename(path), "ext": "zip", "kind": "zip", "size_bytes": os.path.getsize(path)}
+    budget = budget if budget is not None else {"bytes": MAX_UNPACKED_BYTES}  # shared by nested archives
     tmp = tempfile.mkdtemp(prefix="guard_")
+    root = os.path.abspath(tmp)
     inner = []
     try:
         with zipfile.ZipFile(path) as z:
             entries = [i for i in z.infolist() if not i.is_dir()]
             f["entries"] = [i.filename for i in entries]
             f["junk"] = [n for n in f["entries"] if ZIP_JUNK_RE.search(n)]
+            if len(entries) > MAX_ZIP_ENTRIES:
+                f["error"] = f"archive has {len(entries)} files; more than {MAX_ZIP_ENTRIES} are not unpacked"
+                entries = []
             for i in entries:
                 if ZIP_JUNK_RE.search(i.filename):
                     continue
                 safe = os.path.normpath(i.filename).lstrip("\\/.")
-                target = os.path.join(tmp, safe)
-                if not os.path.abspath(target).startswith(os.path.abspath(tmp)):
-                    continue  # path traversal attempt
+                target = os.path.abspath(os.path.join(tmp, safe))
+                if os.path.commonpath([root, target]) != root:
+                    continue  # path traversal attempt ("../../evil")
                 os.makedirs(os.path.dirname(target), exist_ok=True)
                 label = f"{f['name']}/{i.filename}"
                 try:
                     with z.open(i) as src, open(target, "wb") as dst:
-                        shutil.copyfileobj(src, dst)
-                except Exception as e:  # password-protected or damaged entry
+                        budget["bytes"] -= _copy_limited(src, dst, budget["bytes"])
+                except Exception as e:  # password-protected, damaged, or too big when unpacked
                     ext = os.path.splitext(i.filename)[1].lower().lstrip(".")
                     inner.append({"name": label, "ext": ext, "size_bytes": i.file_size, "in_zip": f["name"],
                                   "error": f"cannot extract: {e}"})
                     continue
                 if target.lower().endswith(".zip") and depth < 2:
-                    sub = read_zip(target, depth + 1)
+                    sub = read_zip(target, depth + 1, budget)
                     sub["name"] = label
                     inner.append(sub)
                     inner.extend(sub.pop("inner", []))

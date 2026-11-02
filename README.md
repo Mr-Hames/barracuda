@@ -1,6 +1,6 @@
 ![Barracuda, deliverable contract guard](assets/banner.jpg)
 
-[![tests](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml/badge.svg)](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml)
+[![tests](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml/badge.svg)](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml) [![codeql](https://github.com/Mr-Hames/barracuda/actions/workflows/codeql.yml/badge.svg)](https://github.com/Mr-Hames/barracuda/actions/workflows/codeql.yml) [![release](https://img.shields.io/github/v/release/Mr-Hames/barracuda)](https://github.com/Mr-Hames/barracuda/releases) [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 # Barracuda
 
@@ -58,10 +58,10 @@ The report comes out in the language of the assignment.
 
 ## Install
 
-You need Python 3.9 or newer and four libraries. Install them once:
+You need Python 3.9 or newer and a few libraries. Install them once:
 
 ```bash
-pip install pdfplumber python-docx python-pptx openpyxl
+pip install pdfplumber python-docx python-pptx openpyxl defusedxml
 ```
 
 Then add the skill to your agent. The simplest way picks the right folder by itself:
@@ -100,7 +100,7 @@ python scripts/guard.py --task task.txt report.docx slides.pptx
 
 Add `--format json` to see every detail the script read from your files.
 
-Your files never leave your computer. Everything is read locally.
+Your files never leave your computer. Everything is read locally, and hostile files (zip bombs, tricky archive paths, broken documents) are handled safely. See [SECURITY.md](SECURITY.md).
 
 ## How well it works
 

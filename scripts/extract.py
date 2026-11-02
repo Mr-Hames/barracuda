@@ -63,7 +63,8 @@ ABBREV = re.compile(r"(?:^|\s)(?:max|min|incl|excl|approx|e\.g|i\.e|etc|vs|no|с
 CONTEXT = re.compile(r"^\s*(?:тема|дисциплина|дисципліна|предмет|курс|course|topic|subject|module|модуль|группа|"
                      r"група|group|преподаватель|викладач|teacher|instructor|lecturer|задание|завдання|"
                      r"assignment|task|вариант|варіант)\b[^:—]{0,30}[:—]", re.I)
-HEADING = re.compile(r"^[^.!?]{0,60}:$|^(?:требования|вимоги|requirements|оформление|оформлення|formatting)\b[^.]{0,40}$",
+HEADING = re.compile(r"^[^.!?]{0,60}:$|"
+                     r"^(?:требования|вимоги|requirements|оформление|оформлення|formatting)\b[^.]{0,40}$",
                      re.I)
 NUMBER_WORDS = [
     (r"одн[ау]|один|одного|одной|one", "1"), (r"два|две|двух|дві|двох|two", "2"),
@@ -322,7 +323,8 @@ def parse_fragment(frag, c):
     # Sections and required phrases
     section_cue = re.search(r"раздел\w*|розділ\w*|section\w*|заголов\w*|heading\w*|\bглав\w*|chapter\w*|"
                             r"структур\w*|structure|\bчастин\w*|\bчаст[ьи]\b|\bparts?\b|пункт\w*", low)
-    contains_cue = re.search(r"содерж\w*|включ\w*|указ\w*|укаж\w*|вкаж\w*|наличи\w*|містит\w*|вказ\w*|зазнач\w*|contain\w*|"
+    contains_cue = re.search(r"содерж\w*|включ\w*|указ\w*|укаж\w*|вкаж\w*|наличи\w*|містит\w*|вказ\w*|"
+                             r"зазнач\w*|contain\w*|"
                              r"includ\w*|mention\w*|\bstate\b|присутств\w*|присутн\w*|appear\w*|должн\w* быть|"
                              r"має бути|must (?:have|be)", low)
     if section_cue:
@@ -376,7 +378,8 @@ def parse_fragment(frag, c):
     if re.search(r"заглуш\w*|lorem|placeholder\w*|шаблонн\w* текст|незаполненн\w*|незаповнен\w*|\btodo\b|"
                  r"template text|рыб\w*|пуст\w* пол|порожн\w* пол|dummy text|filler text", low):
         c.add(frag, "no_placeholders", target)
-    if re.search(r"(?:ошиб\w*|помил\w*) (?:в|у) формул|#ref|#div|#знач|#дел|#ссыл|#имя|#н/д|#value|#name|#n/a|formula errors|errors in (?:the )?formulas|"
+    if re.search(r"(?:ошиб\w*|помил\w*) (?:в|у) формул|#ref|#div|#знач|#дел|#ссыл|#имя|#н/д|#value|#name|#n/a|"
+                 r"formula errors|errors in (?:the )?formulas|"
                  r"формул\w*[^.]{0,20}без (?:ошиб|помил)|без (?:ошиб|помил)\w*[^.]{0,20}формул|"
                  r"формул\w*[^.]{0,30}(?:коррект|корект|correct)|(?:ошиб|помил)\w* (?:вычислен|обчислен)|"
                  r"formulas?[^.]{0,30}(?:no errors|without errors|error[- ]free)|"

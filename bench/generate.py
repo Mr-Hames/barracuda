@@ -8,7 +8,6 @@ its type, target and the expected status: "fail" (planted violation), "pass", or
 Needs: pymupdf, python-docx, python-pptx, openpyxl, Pillow; Windows fonts for PDFs.
 """
 import argparse
-import io
 import json
 import os
 import random
@@ -431,7 +430,7 @@ def build_docx(rnd, m, path, tmp):
         d.add_paragraph("Lorem ipsum dolor sit amet")
     for i in range(m["images"]):
         d.add_picture(png(rnd, os.path.join(tmp, f"d{i}.png")), width=Mm(40))
-    for k in range(m["comments"]):
+    for _ in range(m["comments"]):
         d.add_comment(first.runs, text="please fix", author="Teacher")
     if m["tracked"]:
         first._p.append(parse_xml(f'<w:ins {nsdecls("w")} w:id="901" w:author="Teacher" '
@@ -554,7 +553,7 @@ def _build_case(idx, seed, out, rnd):
         if sheet_req.get("violate"):
             xm["sheets"] = sheet_req["names"][:1] + ["Sheet9"]
         xm["formula_error"] = any(r["type"] == "no_formula_errors" and r.get("violate") for r in plan["reqs"])
-        path = os.path.join(tmp if plan["packed"] else files_dir, f"data.xlsx")
+        path = os.path.join(tmp if plan["packed"] else files_dir, "data.xlsx")
         build_xlsx(rnd, xm, path, tmp)
         built.append(path)
     if plan["packed"]:
