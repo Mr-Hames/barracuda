@@ -50,6 +50,7 @@ def report(path):
             d.add_paragraph(text)
     first = d.paragraphs[2]
     d.add_comment(first.runs, text="Add a source for the survey numbers", author="Reviewer")
+    d.core_properties.author = d.core_properties.last_modified_by = "Student"
     d.save(path)
 
 
@@ -61,6 +62,7 @@ def deck(path):
         slide = prs.slides.add_slide(prs.slide_layouts[1])
         slide.shapes.title.text = t
         slide.placeholders[1].text = "Key points for this part of the pitch."
+    prs.core_properties.author = prs.core_properties.last_modified_by = "Student"
     prs.save(path)
 
 
@@ -75,6 +77,7 @@ def workbook(path):
     forecast.append(["Month", "Cups", "Growth"])
     forecast.append(["Jul", 3500, 0.06])
     forecast.append(["Aug", 0, "#DIV/0!"])  # a broken growth formula, saved with its error value
+    wb.properties.creator = wb.properties.lastModifiedBy = "Student"
     wb.save(path)
 
 
