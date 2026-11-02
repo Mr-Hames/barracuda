@@ -1,4 +1,6 @@
-# 🐟 Barracuda — Deliverable Contract Guard (prototype)
+![Barracuda — Deliverable Contract Guard](assets/banner.jpg)
+
+# Barracuda — Deliverable Contract Guard (prototype)
 
 A Claude skill that checks submitted files against a plain-text assignment: it turns the task text (Russian, Ukrainian or English) into a list of requirements, checks the objective ones in the actual PDF / DOCX / PPTX / XLSX / ZIP files, and lists everything it could not verify instead of calling it done.
 
