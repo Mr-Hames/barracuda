@@ -18,18 +18,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "submission")
 
 BODY = [
-    "Bean & Brick is a small coffee roaster that wants to open its first café in the city centre. "
-    "This report looks at who drinks speciality coffee nearby, what they pay today and how a new brand "
-    "can win a place in their morning routine.",
-    "The area has eleven cafés within a ten minute walk. Most of them are chains with similar menus and "
-    "prices between 3 and 4.5 euros for a flat white. Only two roast their own beans, and neither tells "
-    "customers where the coffee comes from.",
-    "We surveyed 120 people near the planned location. Students and office workers make up most of the "
-    "morning traffic. They care about speed first, taste second and price third. Almost half said they "
-    "would try a new place if a friend recommended it.",
-    "Bean & Brick should open with a short menu, a loyalty card from day one and a weekly cupping session "
-    "where customers taste new beans for free. Local partnerships with two coworking spaces would bring "
-    "steady weekday orders.",
+    ("Bean & Brick is a small coffee roaster that wants to open its first café in the city centre. "
+     "This report looks at who drinks speciality coffee nearby, what they pay today and how a new brand "
+     "can win a place in their morning routine."),
+    ("The area has eleven cafés within a ten minute walk. Most of them are chains with similar menus and "
+     "prices between 3 and 4.5 euros for a flat white. Only two roast their own beans, and neither tells "
+     "customers where the coffee comes from."),
+    ("We surveyed 120 people near the planned location. Students and office workers make up most of the "
+     "morning traffic. They care about speed first, taste second and price third. Almost half said they "
+     "would try a new place if a friend recommended it."),
+    ("Bean & Brick should open with a short menu, a loyalty card from day one and a weekly cupping session "
+     "where customers taste new beans for free. Local partnerships with two coworking spaces would bring "
+     "steady weekday orders."),
 ]
 
 

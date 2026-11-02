@@ -47,7 +47,7 @@ def run(task_text=None, files=(), contract=None):
 
 # ---------- human-readable report ----------
 
-from report import LABELS, detect_lang, markdown, to_html  # noqa: E402,F401 (re-exported)
+from report import detect_lang, markdown, to_html  # noqa: E402
 
 
 # ---------- self-test ----------
