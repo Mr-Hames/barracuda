@@ -33,3 +33,4 @@ select = ["E", "F", "W", "B", "UP"]
 "bench/generate.py" = ["E501"]
 # CSS and the HTML template read better as unbroken lines
 "scripts/report.py" = ["E501"]
+"scripts/hints.py" = ["E501"]

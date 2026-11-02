@@ -20,7 +20,7 @@ Compare what the assignment asks for with what is really in the files. A script 
    - If it prints `"error": "missing_dependencies"`, run the command in its `"fix"` field, then run step 2 again.
    - To confirm the installation works: `python SKILL_DIR/scripts/guard.py --selftest` must print `"selftest": "ok"`.
 
-3. **Show the report** the script printed (Markdown) to the user. It is already in the assignment's language. You may translate the evidence notes into the user's language and add, under each item in "Not met", one short sentence on how to fix it (e.g. "add 2 pages", "rename the file to …", "Review → Accept All Changes", "remove the __MACOSX folder from the archive").
+3. **Show the report** the script printed (Markdown) to the user. It is already in the assignment's language, and lines starting with → already say how to fix each item or how to check it by hand. Keep them. You may translate the report into the user's language and add a fix where an item has none (e.g. "remove the __MACOSX folder from the archive").
 
 ## Rules (always)
 

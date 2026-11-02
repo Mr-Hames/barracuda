@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Every problem in the report now says how to fix it ("Remove 2 slides", "Rename the file, for example Smith_Marketing_Report.docx", the exact Word menu), in English, Ukrainian and Russian.
+- Items that need a human check say how to check them (deadline, plagiarism, sources, citation style, spacing).
+- HTML report: lists the checked files, shows the date and time of the check, one quote style, clearer section headings with counts, better contrast in dark mode, no hard-edged header.
+
 ## 0.1.0 (2 November 2026)
 
 First public prototype.
