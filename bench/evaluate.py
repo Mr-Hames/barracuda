@@ -105,6 +105,7 @@ def main():
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     ok = (summary["recall"] or 0) >= 0.9 and summary["false_pass"] == 0
     print("CRITERION MET" if ok else "CRITERION NOT MET")
+    sys.exit(0 if ok else 1)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 ![Barracuda, deliverable contract guard](assets/banner.jpg)
 
+[![tests](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml/badge.svg)](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml)
+
 # Barracuda
 
 You finished the work. Before you send it, Barracuda reads the assignment, opens your files and tells you what's missing.

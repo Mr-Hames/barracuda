@@ -63,3 +63,4 @@ if __name__ == "__main__":
     for text, why in misses:
         print(f"MISS  {text}\n      {why}")
     print(f"\n{ok}/{len(CASES)} phrasings read correctly ({ok / len(CASES):.0%})")
+    sys.exit(0 if ok == len(CASES) else 1)  # CI: any regression is a failure
