@@ -35,7 +35,7 @@ This is the main rule of the project. If the tool isn't sure, it says so.
 
 ## What a report looks like
 
-Here is Barracuda checking a marketing assignment with a Word report, a PowerPoint pitch and an Excel sheet. Five mistakes were hidden in the files, and it found all five.
+Here is Barracuda checking a marketing assignment with a Word report, a PowerPoint pitch and an Excel sheet. Five mistakes were hidden in the files, and it found all five. This is the real page it produces (`--format html`), not a mock-up. It follows your system's light or dark theme and works on a phone.
 
 ![Example report](assets/example-report.png)
 
@@ -93,7 +93,7 @@ You can also run the checker yourself, without an agent:
 python scripts/guard.py --task task.txt report.docx slides.pptx
 ```
 
-Add `--format json` to see every detail the script read from your files.
+That prints the report as text. For the page shown above, add `--format html --out report.html` and open the file in your browser. Add `--format json` to see every detail the script read from your files.
 
 Your files never leave your computer. Everything is read locally, and hostile files (zip bombs, tricky archive paths, broken documents) are handled safely. See [SECURITY.md](SECURITY.md).
 

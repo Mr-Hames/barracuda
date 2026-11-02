@@ -58,4 +58,4 @@ Contract items: `{"id", "type", "target", "source", ...}`. `target` = `pdf` / `d
 | sheets | names: [...] and/or min |
 | unverified | reason |
 
-Add `--format json` to any check command for the full details (facts read from every file).
+Add `--format json` to any check command for the full details (facts read from every file). Add `--format html --out barracuda-report.html` for a self-contained report page (light/dark, mobile, loads nothing from the internet); offer it when the user wants something to keep or share.

@@ -2,6 +2,7 @@
 
   python guard.py --task task.txt report.docx slides.pptx         # ready-to-show report (Markdown)
   python guard.py --task task.txt --format json report.docx       # full details as JSON
+  python guard.py --task task.txt --format html --out report.html report.docx   # a page for the browser
   python guard.py --task task.txt --extract-only                  # just the contract (to review/edit)
   python guard.py --contract contract.json report.pdf data.zip    # check against an edited contract
   python guard.py --selftest                                      # is everything installed and working?
@@ -12,7 +13,6 @@ import argparse
 import importlib
 import json
 import os
-import re
 import shutil
 import sys
 import tempfile
@@ -47,59 +47,7 @@ def run(task_text=None, files=(), contract=None):
 
 # ---------- human-readable report ----------
 
-LABELS = {
-    "en": {"fail": "NOT READY", "incomplete": "CHECK MANUALLY", "pass": "READY",
-           "summary": "{f} not met · {p} met · {u} need a human check",
-           "not_met": "Not met", "manual": "Needs a human check (the files can't show this)", "met": "Met",
-           "files": "Files checked", "none": "(no requirements found in the assignment)",
-           "all_ok_but": "All checkable requirements are met, but {u} need a human check: don't call it done yet."},
-    "ru": {"fail": "НЕ ГОТОВО", "incomplete": "ПРОВЕРЬТЕ ВРУЧНУЮ", "pass": "ГОТОВО",
-           "summary": "не выполнено: {f} · выполнено: {p} · нужна ручная проверка: {u}",
-           "not_met": "Не выполнено", "manual": "Нужна ручная проверка (по файлам этого не определить)",
-           "met": "Выполнено", "files": "Проверенные файлы", "none": "(в задании не найдено требований)",
-           "all_ok_but": "Все проверяемые требования выполнены, но {u} нужно проверить вручную, "
-                         "поэтому работу пока не считайте готовой."},
-    "uk": {"fail": "НЕ ГОТОВО", "incomplete": "ПЕРЕВІРТЕ ВРУЧНУ", "pass": "ГОТОВО",
-           "summary": "не виконано: {f} · виконано: {p} · потрібна ручна перевірка: {u}",
-           "not_met": "Не виконано", "manual": "Потрібна ручна перевірка (за файлами цього не визначити)",
-           "met": "Виконано", "files": "Перевірені файли", "none": "(у завданні не знайдено вимог)",
-           "all_ok_but": "Усі вимоги, які можна перевірити, виконано, але {u} треба перевірити вручну, "
-                         "тож роботу поки не вважайте готовою."},
-}
-
-
-def detect_lang(text):
-    if re.search(r"[іїєґІЇЄҐ]", text or ""):
-        return "uk"
-    if re.search(r"[а-яА-ЯёЁ]", text or ""):
-        return "ru"
-    return "en"
-
-
-def markdown(report, lang="en"):
-    L = LABELS[lang]
-    res = [r for r in report["results"]]
-    c = report["counts"]
-    lines = [f"# Barracuda: {L[report['verdict']]}", "",
-             L["summary"].format(f=c["fail"], p=c["pass"], u=c["unverified"]), ""]
-    if report["verdict"] == "incomplete":
-        lines += [L["all_ok_but"].format(u=c["unverified"]), ""]
-    if not res:
-        lines += [L["none"], ""]
-    for status, title in (("fail", L["not_met"]), ("unverified", L["manual"]), ("pass", L["met"])):
-        group = [r for r in res if r["status"] == status]
-        if not group:
-            continue
-        lines += [f"## {title}", ""]
-        for n, r in enumerate(group, 1):
-            evidence = "; ".join(e for e in r["evidence"] if not e.startswith("not measurable, skipped"))
-            source = r.get("source", "").strip()
-            lines.append(f"{n}. **{source}**. {evidence}" if status != "pass" else f"- {source}. {evidence}")
-        lines.append("")
-    names = [f["name"] for f in report.get("files", [])]
-    if names:
-        lines += [f"{L['files']}: " + ", ".join(names)]
-    return "\n".join(lines).rstrip() + "\n"
+from report import LABELS, detect_lang, markdown, to_html  # noqa: E402,F401 (re-exported)
 
 
 # ---------- self-test ----------
@@ -131,7 +79,9 @@ def main():
     p.add_argument("--task", help="assignment text file (UTF-8)")
     p.add_argument("--contract", help="contract JSON (from --extract-only, possibly edited)")
     p.add_argument("--extract-only", action="store_true", help="print the contract and stop")
-    p.add_argument("--format", choices=("md", "json"), default="md", help="md: ready-to-show report (default)")
+    p.add_argument("--format", choices=("md", "html", "json"), default="md",
+                   help="md: ready-to-show text report (default); html: a page to open in the browser; json: details")
+    p.add_argument("--out", help="write the report to this file instead of the screen")
     p.add_argument("--lang", choices=("en", "ru", "uk"), help="report language (default: the assignment's)")
     p.add_argument("--selftest", action="store_true", help="check the installation")
     a = p.parse_args()
@@ -174,11 +124,19 @@ def main():
         print(json.dumps({"error": "no_files", "fix": "pass the submitted files after the options"}, indent=2))
         sys.exit(2)
     report = run(text, a.files, contract)
+    lang = a.lang or detect_lang(text or " ".join(r.get("source", "") for r in report["results"]))
     if a.format == "json":
-        print(json.dumps(report, ensure_ascii=False, indent=2))
+        output = json.dumps(report, ensure_ascii=False, indent=2)
+    elif a.format == "html":
+        output = to_html(report, lang)
     else:
-        lang = a.lang or detect_lang(text or " ".join(r.get("source", "") for r in report["results"]))
-        print(markdown(report, lang))
+        output = markdown(report, lang)
+    if a.out:
+        with open(a.out, "w", encoding="utf-8") as fh:
+            fh.write(output)
+        print(f"Report saved to {os.path.abspath(a.out)}")
+    else:
+        print(output)
 
 
 if __name__ == "__main__":

@@ -31,3 +31,5 @@ select = ["E", "F", "W", "B", "UP"]
 [tool.ruff.lint.per-file-ignores]
 # assignment phrase templates: long string literals read better unbroken
 "bench/generate.py" = ["E501"]
+# CSS and the HTML template read better as unbroken lines
+"scripts/report.py" = ["E501"]
