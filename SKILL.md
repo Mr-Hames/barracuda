@@ -1,9 +1,9 @@
 ---
-name: deliverable-guard
+name: barracuda
 description: Check submitted files (PDF, DOCX, PPTX, XLSX, ZIP) against a plain-text assignment, brief or contract before handing them in. Turns the task text into a list of requirements, checks the objective ones in the real files (format, file name, size, pages, slides, words, sections, phrases, font, font size, margins, page format, images, comments, tracked changes, placeholder text, sheets, formula errors, junk files in archives) and lists everything it could not verify. Use when the user asks whether their work meets the requirements, before submitting homework, a report, a tender or client deliverable, or to compare files with a brief.
 ---
 
-# Deliverable Contract Guard
+# Barracuda — Deliverable Contract Guard
 
 Compare what was asked with what is in the files. Never call a requirement met without evidence.
 

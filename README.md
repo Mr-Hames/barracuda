@@ -1,4 +1,4 @@
-# Deliverable Contract Guard (prototype)
+# 🐟 Barracuda — Deliverable Contract Guard (prototype)
 
 A Claude skill that checks submitted files against a plain-text assignment: it turns the task text (Russian, Ukrainian or English) into a list of requirements, checks the objective ones in the actual PDF / DOCX / PPTX / XLSX / ZIP files, and lists everything it could not verify instead of calling it done.
 
@@ -16,6 +16,17 @@ Criterion to continue: on 50 prepared assignments with file sets, detect ≥ 90%
 **Read these numbers with care.** The benchmark is synthetic: assignments are generated from phrase templates written by the same author as the parser, so it measures the checker and the file readers well and the understanding of real-world wording optimistically. `tests/test_extract.py` adds 15 phrasings that are not in the generator (13 passed on the first try; the 2 failures were fixed). The honest next step is 50 real assignments with real student or client files, labelled by hand.
 
 Known limits: DOCX page count is only known if Word saved it; margins only from DOCX; fonts from PPTX/XLSX are not read; line spacing, character counts, citation styles, originality, tone and deadlines are always "unverified"; requirements written as number words ("five pages") are not parsed.
+
+## Install
+
+Claude Code:
+
+```bash
+git clone https://github.com/Mr-Hames/barracuda ~/.claude/skills/barracuda
+pip install -r ~/.claude/skills/barracuda/requirements.txt
+```
+
+Claude.ai: download the repo as ZIP and upload it in Settings → Capabilities → Skills.
 
 ## Use
 

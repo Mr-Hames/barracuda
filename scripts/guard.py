@@ -1,4 +1,4 @@
-"""Deliverable Contract Guard: check submitted files against a plain-text assignment.
+"""Barracuda (Deliverable Contract Guard): check submitted files against a plain-text assignment.
 
   python guard.py --task task.txt report.docx slides.pptx         # extract + check
   python guard.py --task task.txt --extract-only                  # just the contract (to review/edit)
