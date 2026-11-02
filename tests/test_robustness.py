@@ -84,13 +84,15 @@ class BadFiles(unittest.TestCase):
         z = self.path("locked.zip")
         with zipfile.ZipFile(z, "w") as zf:
             zf.writestr("a.docx", b"x" * 100)
-        data = bytearray(open(z, "rb").read())
+        with open(z, "rb") as fh:
+            data = bytearray(fh.read())
         # set the "encrypted" flag on the local and central headers
         for sig in (b"PK\x03\x04", b"PK\x01\x02"):
             i = data.find(sig)
             off = 6 if sig == b"PK\x03\x04" else 8
             data[i + off] |= 1
-        open(z, "wb").write(bytes(data))
+        with open(z, "wb") as fh:
+            fh.write(bytes(data))
         r = run("Submit a ZIP with a Word document (DOCX) of at least 10 words.", [z])
         self.assertNotEqual(statuses(r).get("words"), "pass")
 

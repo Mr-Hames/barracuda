@@ -63,9 +63,12 @@ ABBREV = re.compile(r"(?:^|\s)(?:max|min|incl|excl|approx|e\.g|i\.e|etc|vs|no|с
 CONTEXT = re.compile(r"^\s*(?:тема|дисциплина|дисципліна|предмет|курс|course|topic|subject|module|модуль|группа|"
                      r"група|group|преподаватель|викладач|teacher|instructor|lecturer|задание|завдання|"
                      r"assignment|task|вариант|варіант)\b[^:—]{0,30}[:—]", re.I)
-HEADING = re.compile(r"^[^.!?]{0,60}:$|"
-                     r"^(?:требования|вимоги|requirements|оформление|оформлення|formatting)\b[^.]{0,40}$",
-                     re.I)
+HEADINGS = [re.compile(r"[^.!?]{0,60}:", re.I),  # "Требования к оформлению:"
+            re.compile(r"(?:требования|вимоги|requirements|оформление|оформлення|formatting)\b[^.]{0,40}", re.I)]
+
+
+def is_heading(frag):
+    return any(h.fullmatch(frag) for h in HEADINGS)
 NUMBER_WORDS = [
     (r"одн[ау]|один|одного|одной|one", "1"), (r"два|две|двух|дві|двох|two", "2"),
     (r"три|трех|трьох|three", "3"), (r"четыре|четырех|чотири|чотирьох|four", "4"),
@@ -390,7 +393,7 @@ def parse_fragment(frag, c):
         c.add(frag, "zip_clean", "zip")
 
     produced = len(c.items) > before
-    understood_nothing = not produced and not CONTEXT.match(frag) and not HEADING.match(frag)
+    understood_nothing = not produced and not CONTEXT.match(frag) and not is_heading(frag)
     if understood_nothing or SUBJECTIVE.search(frag):
         c.add(frag, "unverified", None, reason="not an objective file property the checker understands")
 

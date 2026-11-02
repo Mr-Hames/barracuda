@@ -13,6 +13,7 @@ import importlib
 import json
 import os
 import re
+import shutil
 import sys
 import tempfile
 
@@ -119,11 +120,7 @@ def selftest():
     got = {r["type"]: r["status"] for r in report["results"]}
     expected = {"file_required": "pass", "sections": "fail", "words": "pass", "unverified": "unverified"}
     problems = [f"{k}: expected {v}, got {got.get(k)}" for k, v in expected.items() if got.get(k) != v]
-    try:
-        os.remove(path)
-        os.rmdir(tmp)
-    except OSError:
-        pass
+    shutil.rmtree(tmp, ignore_errors=True)  # a leftover temp folder must not fail the self-test
     return {"selftest": "ok" if not problems else "failed", "python": sys.version.split()[0],
             "problems": problems}
 
