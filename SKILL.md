@@ -3,7 +3,7 @@ name: barracuda
 description: Check submitted files (PDF, DOCX, PPTX, XLSX, ZIP) against a plain-text assignment, brief or contract before handing them in. Turns the task text into requirements, checks the objective ones in the real files (format, file name, size, pages, slides, words, sections, phrases, font, font size, margins, page format, images, comments, tracked changes, placeholder text, sheets, formula errors, junk files in archives) and lists everything it could not verify. Use when the user asks whether their work meets the requirements, before submitting homework, a report, a tender or client deliverable, or to compare files with a brief.
 ---
 
-# Barracuda — Deliverable Contract Guard
+# Barracuda: Deliverable Contract Guard
 
 Compare what the assignment asks for with what is really in the files. A script does the checking; your job is to run it and show its report.
 
