@@ -80,5 +80,33 @@ class Paraphrases(unittest.TestCase):
         self.assertEqual(items("Тема: История Киева."), [])
 
 
+class HandEditedContracts(unittest.TestCase):
+    """A model may edit the contract badly: it must never turn into a false 'pass'."""
+
+    def setUp(self):
+        from check import check
+        self.check = check
+        self.files = [{"name": "a.pdf", "ext": "pdf", "size_bytes": 1000, "pages": 3, "words": 100, "text": "x"}]
+
+    def status(self, item):
+        return self.check([dict(item, id="R1", source="s")], self.files)["results"][0]["status"]
+
+    def test_missing_numbers_is_unverified(self):
+        self.assertEqual(self.status({"type": "pages", "target": "pdf"}), "unverified")
+
+    def test_numbers_as_strings(self):
+        self.assertEqual(self.status({"type": "pages", "target": ".PDF", "min": "10"}), "fail")
+        self.assertEqual(self.status({"type": "pages", "target": "pdf", "min": "2,5"}), "pass")
+
+    def test_garbage_number(self):
+        self.assertEqual(self.status({"type": "pages", "target": "pdf", "min": "ten"}), "unverified")
+
+    def test_unknown_type(self):
+        self.assertEqual(self.status({"type": "originality", "target": None}), "unverified")
+
+    def test_pattern_without_regex(self):
+        self.assertEqual(self.status({"type": "filename", "target": "pdf", "pattern": "<Surname>_HW1.pdf"}), "fail")
+
+
 if __name__ == "__main__":
     unittest.main()

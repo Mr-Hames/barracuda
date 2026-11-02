@@ -193,7 +193,52 @@ def per_file(req, f):
     return "unverified", f"{name}: unknown requirement type {t}"
 
 
+REQUIRED = {  # a contract item without these can't be checked (e.g. hand-edited by a model)
+    "pages": ("min", "max"), "slides": ("min", "max"), "words": ("min", "max"), "images": ("min", "max"),
+    "sections": ("items",), "contains": ("phrases",), "font": ("name",), "font_size": ("value",),
+    "margins": ("left", "right", "top", "bottom"), "page_format": ("paper", "orientation"),
+    "filename": ("regex", "pattern"), "max_size_mb": ("max",), "sheets": ("names", "min"),
+    "only_formats": ("exts",), "file_required": ("target",),
+}
+NUMERIC = ("min", "max", "value", "left", "right", "top", "bottom")
+
+
+def normalise(req):
+    """Make a contract item safe: numbers as numbers, a regex for a pattern, required fields present.
+    Returns (item, problem or None)."""
+    req = dict(req)
+    req["type"] = str(req.get("type") or "unverified").strip()
+    if req.get("target") in ("", "any", "all", "none"):
+        req["target"] = None
+    if isinstance(req.get("target"), str):
+        req["target"] = req["target"].lower().lstrip(".")
+    for k in NUMERIC:
+        if k in req and req[k] is not None:
+            try:
+                req[k] = float(str(req[k]).replace(",", ".").split()[0])
+            except (ValueError, IndexError):
+                return req, f"«{k}» is not a number: {req[k]!r}"
+    for k in ("items", "phrases", "names", "exts"):
+        if isinstance(req.get(k), str):
+            req[k] = [req[k]]
+    if req["type"] == "filename" and not req.get("regex") and req.get("pattern"):
+        from extract import name_regex
+        req["regex"] = name_regex(req["pattern"])
+    needed = REQUIRED.get(req["type"])
+    if needed and not any(req.get(k) not in (None, [], "") for k in needed):
+        return req, f"contract item has none of: {', '.join(needed)}"
+    if req["type"] == "filename":
+        try:
+            re.compile(req["regex"])
+        except re.error as e:
+            return req, f"bad file name pattern: {e}"
+    return req, None
+
+
 def check_one(req, files):
+    req, problem = normalise(req)
+    if problem:
+        return "unverified", [problem]
     t = req["type"]
     if t == "unverified":
         return "unverified", [req.get("reason", "needs a human check")]

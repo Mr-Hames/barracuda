@@ -19,23 +19,50 @@ Known limits: DOCX page count is only known if Word saved it; margins only from 
 
 ## Install
 
-Claude Code:
+The skill is a `SKILL.md` plus a Python script (Python 3.9+), so it works in any agent that supports Agent Skills and can run terminal commands. Install the libraries once:
 
 ```bash
-git clone https://github.com/Mr-Hames/barracuda ~/.claude/skills/barracuda
-pip install -r ~/.claude/skills/barracuda/requirements.txt
+pip install pdfplumber python-docx python-pptx openpyxl
+```
+
+Then put this repository into your agent's skills folder. The easiest way (picks the right folder for each agent):
+
+```bash
+npx skills add Mr-Hames/barracuda
+```
+
+Or clone it by hand:
+
+| Agent | Folder (user-wide) |
+|---|---|
+| Claude Code | `~/.claude/skills/barracuda` |
+| Codex | `~/.codex/skills/barracuda` (or `.agents/skills/` in a project) |
+| Google Antigravity | `~/.gemini/antigravity/skills/barracuda` |
+| Cursor | `~/.cursor/skills/barracuda` (or `.cursor/skills/` in a project) |
+| GitHub Copilot | `~/.copilot/skills/barracuda` (or `.github/skills/` in a project) |
+
+```bash
+git clone https://github.com/Mr-Hames/barracuda <folder from the table>
 ```
 
 Claude.ai: download the repo as ZIP and upload it in Settings → Capabilities → Skills.
 
+Folder names change between agent versions; if the agent doesn't see the skill, check its documentation for "skills". To check the installation: `python scripts/guard.py --selftest`.
+
 ## Use
 
+Ask the agent: "check my files against this assignment" and attach the files and the task text. Or run it directly:
+
 ```bash
-pip install pdfplumber python-docx python-pptx openpyxl
-python scripts/guard.py --task task.txt report.docx slides.pptx archive.zip
-python scripts/guard.py --task task.txt --extract-only > contract.json   # review, edit, then:
+python scripts/guard.py --task task.txt report.docx slides.pptx archive.zip       # Markdown report
+python scripts/guard.py --task task.txt --format json report.docx                  # full JSON
+python scripts/guard.py --task task.txt --extract-only > contract.json             # review, edit, then:
 python scripts/guard.py --contract contract.json report.docx
 ```
+
+The report comes in the assignment's language (English, Russian, Ukrainian). The script does all the checking, so results don't depend on which model runs it; the model only shows the report. Hand-edited contracts are validated: an item with missing or non-numeric values becomes "needs a human check", never "met".
+
+Tested on Python 3.9, 3.10, 3.11, 3.12 and 3.13 (Windows).
 
 ## Benchmark
 
