@@ -1,6 +1,6 @@
 ![Barracuda, deliverable contract guard](assets/banner.jpg)
 
-[![tests](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml/badge.svg)](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml) [![codeql](https://github.com/Mr-Hames/barracuda/actions/workflows/codeql.yml/badge.svg)](https://github.com/Mr-Hames/barracuda/actions/workflows/codeql.yml) [![release](https://img.shields.io/github/v/release/Mr-Hames/barracuda)](https://github.com/Mr-Hames/barracuda/releases) [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![tests](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml/badge.svg)](https://github.com/Mr-Hames/barracuda/actions/workflows/tests.yml) [![codeql](https://github.com/Mr-Hames/barracuda/actions/workflows/codeql.yml/badge.svg)](https://github.com/Mr-Hames/barracuda/actions/workflows/codeql.yml) [![release](https://img.shields.io/github/v/release/Mr-Hames/barracuda)](https://github.com/Mr-Hames/barracuda/releases) [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16182/badge)](https://www.bestpractices.dev/projects/16182)
 
 # Barracuda
 
