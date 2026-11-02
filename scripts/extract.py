@@ -286,8 +286,10 @@ def parse_fragment(frag, c):
 
     # File name
     if re.search(r"назов|назвать|назван\w* файл|имя файла|имени файла|ім'?я файлу|назв\w* файл|file ?name|"
-                 r"name (?:the|your) file|\bnamed\b|называться|називатися|назвіть|save (?:it|the file|your file|"
-                 r"your work)? ?as|сохрани\w* (?:его |файл )?как|збереж\w* (?:його |файл )?як", low):
+                 r"name (?:the|your) (?:file|report|document|essay|paper|deck|presentation|spreadsheet|"
+                 r"workbook|archive|work|submission)|\bnamed\b|называться|називатися|назвіть|"
+                 r"save (?:it|the file|your file|your work)? ?as|сохрани\w* (?:его |файл )?как|"
+                 r"збереж\w* (?:його |файл )?як", low):
         cands = quoted(frag) or re.findall(r"[\w\-<>\[\]{}]+\.(?:pdf|docx|pptx|xlsx|zip)", frag, re.I)
         cands = cands or re.findall(r"[\w<>\[\]{}]+(?:[_\-][\w<>\[\]{}]+)+", frag)
         if cands:
@@ -395,7 +397,7 @@ def parse_fragment(frag, c):
     produced = len(c.items) > before
     understood_nothing = not produced and not CONTEXT.match(frag) and not is_heading(frag)
     if understood_nothing or SUBJECTIVE.search(frag):
-        c.add(frag, "unverified", None, reason="not an objective file property the checker understands")
+        c.add(frag, "unverified", None, reason="can't be checked from the files")
 
 
 def extract(text):

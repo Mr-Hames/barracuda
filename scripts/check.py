@@ -46,6 +46,11 @@ def pick(req, files):
     if req["type"] in TEXT_TYPES:
         # "at least 2000 words" is about the text document, not the spreadsheet that comes with it
         docs = [f for f in readable if f.get("ext") in TEXT_EXTS]
+        # "the report must have 600 words" is about the written document, not the slides next to it
+        about_slides = re.search(r"slide|deck|presentation|слайд|презентац", req.get("source", ""), re.I)
+        written = [f for f in docs if f.get("ext") != "pptx"]
+        if written and not about_slides:
+            docs = written
         return docs or [f for f in readable if f.get("ext") in DOC_EXTS]
     if req["type"] in ("no_placeholders", "no_comments", "no_tracked_changes"):
         return [f for f in readable if f.get("ext") in DOC_EXTS]
@@ -141,7 +146,7 @@ def per_file(req, f):
         n = f.get("comments")
         if n is None:
             return "unverified", f"{name}: comments can't be read"
-        return ("pass" if n == 0 else "fail"), f"{name}: {n} comments"
+        return ("pass" if n == 0 else "fail"), f"{name}: {n} comment{'' if n == 1 else 's'}"
     if t == "no_tracked_changes":
         if f["ext"] == "pdf":
             return "pass", f"{name}: PDF has no tracked changes"
@@ -159,7 +164,8 @@ def per_file(req, f):
         if errs is None:
             return "unverified", f"{name}: not a spreadsheet"
         if errs:
-            return "fail", f"{name}: {len(errs)} formula errors: " + ", ".join(errs[:5])
+            word = "error" if len(errs) == 1 else "errors"
+            return "fail", f"{name}: {len(errs)} formula {word}: " + ", ".join(errs[:5])
         if f.get("uncalculated_formulas"):
             return "unverified", (f"{name}: {f['uncalculated_formulas']} formulas were saved without results; "
                                   "open and save the file in Excel to check them")
@@ -276,6 +282,8 @@ def check_one(req, files):
             results = measured + [("note", "not measurable, skipped: " + e) for e in skipped]
     statuses = {s for s, _ in results}
     status = "fail" if "fail" in statuses else "unverified" if "unverified" in statuses else "pass"
+    if status in ("fail", "unverified"):
+        return status, [e for s, e in results if s == status]  # only the files that cause it
     return status, [e for _, e in results]
 
 

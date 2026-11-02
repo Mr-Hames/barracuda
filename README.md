@@ -35,24 +35,19 @@ This is the main rule of the project. If the tool isn't sure, it says so.
 
 ## What a report looks like
 
+Here is Barracuda checking a marketing assignment with a Word report, a PowerPoint pitch and an Excel sheet. Five mistakes were hidden in the files, and it found all five.
+
+![Example report](assets/example-report.png)
+
+## Try it in a minute
+
+The repository has that example ready to run, so you don't need your own files to see how it works:
+
+```bash
+python scripts/guard.py --task examples/assignment.txt examples/submission/*
 ```
-# Barracuda: NOT READY
 
-2 not met · 5 met · 1 needs a human check
-
-## Not met
-1. Length: 15-20 pages. report.pdf: 12 pages (need 15–20 pages)
-2. Name the file "<Surname>_Marketing_LR2.pdf". report.pdf: does not match
-
-## Needs a human check (the files can't show this)
-1. The work must be original. Not an objective file property
-
-## Met
-- Submit as a PDF. found: report.pdf
-- Use Times New Roman font. report.pdf: main font TimesNewRomanPSMT
-- Required sections: Introduction, Analysis, Conclusion. report.pdf: all 3 sections found
-...
-```
+Or open `examples/assignment.txt` and the files in `examples/submission/`, then ask your agent "check these files against this assignment".
 
 The report comes out in the language of the assignment.
 

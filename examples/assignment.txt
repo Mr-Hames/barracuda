@@ -1,0 +1,12 @@
+Course: Marketing 101. Topic: launching a local coffee brand.
+
+- Submit your report as a Word document (DOCX) and your pitch as a PowerPoint deck (PPTX).
+- Report length: 600-1200 words.
+- Use Times New Roman, 12 pt. Margins: 25 mm on all sides.
+- The report must include these sections: Introduction, Market Analysis, Recommendations, Conclusion.
+- Remove all comments before submitting.
+- The deck must have no more than 10 slides.
+- Attach your calculations as an Excel file (XLSX) with sheets "Data" and "Forecast". Formulas must have no errors.
+- Name the report "<Surname>_Marketing_Report.docx".
+- The work must be original.
+- Deadline: Friday, 23:59.

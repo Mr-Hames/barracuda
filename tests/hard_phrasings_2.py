@@ -25,6 +25,7 @@ CASES = [
     ("Загальний розмір архіву — не більше 50 МБ.", [("max_size_mb", {"max": 50})]),
     ("Файл назвать по схеме: Группа_Фамилия_Лаб3.docx", [("filename", {"target": "docx"})]),
     ('Save it as "Smith_Proposal_v2.pdf".', [("filename", {"target": "pdf"})]),
+    ('Name the report "<Surname>_Marketing_Report.docx".', [("filename", {"target": "docx"})]),
     ("Основной текст — Calibri 11, заголовки — 14.", [("font", {"name": "Calibri"}), ("font_size", {"value": 11})]),
     ("Шрифт: Times New Roman, розмір 14.", [("font", {"name": "Times New Roman"}), ("font_size", {"value": 14})]),
     ("Поля по 2 см с каждой стороны.", [("margins", {"left": 20, "right": 20, "top": 20, "bottom": 20})]),
