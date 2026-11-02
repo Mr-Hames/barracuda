@@ -14,21 +14,22 @@ EXT_PATTERNS = [
     ("xlsx", r"\bxlsx?\b|excel|эксел\w*|ексел\w*|электронн\w* таблиц\w*|електронн\w* таблиц\w*|spreadsheet"),
     ("zip", r"\bzip\b|архив\w*|архів\w*|\barchive\b"),
 ]
-U_PAGES = r"страниц\w*|\bстр\b\.?|сторін\w*|\bpages?\b"
+U_PAGES = r"страниц\w*|\bстр\b\.?|сторін\w*|\bpages?\b|(?:(?<=\d)|(?<=\d ))с(?:\.|$)"  # "10–12 с."
 U_SLIDES = r"слайд\w*|\bslides?\b"
 U_WORDS = r"\bслов\w*|\bслів\b|\bwords?\b"
 U_IMAGES = (r"рисун\w*|иллюстрац\w*|изображен\w*|картин\w*|ілюстрац\w*|зображен\w*|малюн\w*|диаграмм\w*|"
             r"діаграм\w*|график\w*|графік\w*|\bimages?\b|\bfigures?\b|\bpictures?\b|\bcharts?\b|"
             r"\billustrations?\b|\bdiagrams?\b|\bphotos?\b|фото\w*")
-U_MB = r"\bмб\b|\bmb\b|мегабайт\w*|megabytes?|\bмбайт\b"
+U_MB = r"(?<![a-zа-я])мб\b|(?<![a-zа-я])mb\b|мегабайт\w*|megabytes?|(?<![a-zа-я])мбайт\b"
 U_SHEETS = r"\bлист\w*|\bаркуш\w*|\bsheets?\b|вкладк\w*|\btabs?\b"
 
 Q_EXACT = r"ровно|рівно|exactly|строго|точно"
 Q_MIN = (r"не менее|не меньше|минимум|как минимум|не менше|щонайменше|мінімум|принаймні|хотя бы|"
          r"at least|minimum(?: of)?|\bmin\b\.?|no less than|no fewer than")
-Q_MORE = r"(?<!не )(?:более чем|более|больше)|понад|(?<!не )більше ніж|more than|\bover\b"
+Q_MORE = r"(?<!не )(?:более чем|более|больше)|понад|(?<!не )більше ніж|(?<!no )(?<!not )more than|\bover\b"
 Q_MAX = (r"не более|не больше|максимум|не більше|не перевищ\w*|не превыша\w*|не длиннее|\bдо\b|up to|"
-         r"at most|maximum(?: of)?|\bmax\b\.?|no more than|not exceed\w*|not more than|within|limit(?:ed)? to")
+         r"at most|maximum(?: of)?|\bmax\b\.?|no more than|not exceed\w*|not more than|within|limit(?:ed)? to|"
+         r"\blimit\b(?: is)?:?")
 Q_LESS = r"(?<!не )(?:менее|меньше|менше)|less than|fewer than|\bunder\b"
 Q_AFTER_MIN = r"^\s*(?:или более|и более|і більше|або більше|or more|and more|\+)"
 Q_AFTER_MAX = r"^\s*(?:или меньше|или менее|и менее|або менше|or less|or fewer|max)"
@@ -57,6 +58,24 @@ NAME_PLACEHOLDERS = (r"фамилия|прізвище|surname|last ?name|first 
                      r"group|номер|number|студент|student|id|дата|date|вариант|варіант|variant")
 
 
+ABBREV = re.compile(r"(?:^|\s)(?:max|min|incl|excl|approx|e\.g|i\.e|etc|vs|no|стр|с|см|мм|лев|прав|верх|"
+                    r"ниж|т\.е|т\.к|напр|мин|макс|прим|рис|табл|п|пп|гл|ч|мін|макс)\.$", re.I)
+CONTEXT = re.compile(r"^\s*(?:тема|дисциплина|дисципліна|предмет|курс|course|topic|subject|module|модуль|группа|"
+                     r"група|group|преподаватель|викладач|teacher|instructor|lecturer|задание|завдання|"
+                     r"assignment|task|вариант|варіант)\b[^:—]{0,30}[:—]", re.I)
+HEADING = re.compile(r"^[^.!?]{0,60}:$|^(?:требования|вимоги|requirements|оформление|оформлення|formatting)\b[^.]{0,40}$",
+                     re.I)
+NUMBER_WORDS = [
+    (r"одн[ау]|один|одного|одной|one", "1"), (r"два|две|двух|дві|двох|two", "2"),
+    (r"три|трех|трьох|three", "3"), (r"четыре|четырех|чотири|чотирьох|four", "4"),
+    (r"пять|пяти|п'ять|п'яти|five", "5"), (r"шесть|шести|шість|six", "6"), (r"семь|семи|сім|seven", "7"),
+    (r"восемь|восьми|вісім|eight", "8"), (r"девять|девяти|дев'ять|дев'яти|nine", "9"),
+    (r"десять|десяти|ten", "10"), (r"двенадцати|двенадцать|дванадцяти|дванадцять|twelve", "12"),
+    (r"пятнадцати|пятнадцать|п'ятнадцяти|п'ятнадцять|fifteen", "15"),
+    (r"двадцати|двадцать|двадцяти|двадцять|twenty", "20"),
+]
+
+
 def norm(s):
     return re.sub(r"\s+", " ", s.replace("ё", "е").replace("’", "'")).strip()
 
@@ -68,11 +87,28 @@ def split_fragments(text):
         line = re.sub(r"^\s*(?:[-–—•*·▪●]|\d+[.)]|[a-zа-я][.)])\s+", "", line).strip()
         if not line:
             continue
+        parts = []
         for part in re.split(r"(?<=[.!?])\s+(?=[«\"“A-ZА-ЯЁІЇЄҐ0-9])|;\s*", line):
+            if parts and ABBREV.search(parts[-1]):
+                parts[-1] += " " + part  # "Max. 800 words", "лев. – 3 см"
+            else:
+                parts.append(part)
+        for part in parts:
             part = part.strip(" .")
             if part:
                 out.append(part)
     return out
+
+
+def numberize(text):
+    """'пяти страниц' -> '5 страниц', '1,500 words' -> '1500 words', '3-х рисунков' -> '3 рисунков'."""
+    t = norm(text).lower()
+    t = re.sub(r"(?<=\d)[ \u00a0](?=\d{3}\b)", "", t)
+    t = re.sub(r"(?<=\d),(?=\d{3}\b)", "", t)
+    t = re.sub(r"(\d+)-(?:х|ти|ми|ох|ьох|и)\b", r"\1", t)
+    for pattern, digit in NUMBER_WORDS:
+        t = re.sub(r"(?<![\w'])(?:" + pattern + r")(?![\w'])", digit, t)
+    return t
 
 
 def exts_in(frag):
@@ -113,11 +149,14 @@ def quantity(frag, unit, default="exact"):
     if re.search(Q_EXACT, lead):
         return n, n
     if re.search(Q_AFTER_MIN, tail) or re.search(rf"(?:{Q_MIN})\s*[:—-]?\s*$", lead.strip() + " ") \
-            or re.search(rf"(?:{Q_MIN})\W*$", lead):
-        return n, None
+            or re.search(rf"(?:{Q_MIN})\W*$", lead) or re.search(rf"(?:{Q_MIN})\b[^\d,.;]{{0,20}}$", lead):
+        # "minimum length 6 pages, maximum 8": an upper bound may follow
+        upper = re.search(rf"^[^\d.;]{{0,15}}?(?:{Q_MAX})\s*{num}", low[m.end():])
+        return n, (to_number(upper.group(1)) if upper else None)
     if re.search(rf"(?:{Q_MORE})\W*$", lead):
         return n + 1 if n == int(n) else n, None
-    if re.search(Q_AFTER_MAX, tail) or re.search(rf"(?:{Q_MAX})\W*$", lead):
+    if re.search(Q_AFTER_MAX, tail) or re.search(rf"(?:{Q_MAX})\W*$", lead) \
+            or re.search(rf"(?:{Q_MAX})\b[^\d,.;]{{0,20}}$", lead):
         return None, n
     if re.search(rf"(?:{Q_LESS})\W*$", lead):
         return None, n - 1 if n == int(n) else n
@@ -168,7 +207,7 @@ def name_regex(pattern):
 def margin_values(frag):
     """'левое 30 мм, правое 15 мм, верхнее и нижнее 20 мм' -> {'left': 30, ...}; one value -> all sides."""
     side_words = [("left", r"лев\w*|лів\w*|\bleft\b"), ("right", r"прав\w*|\bright\b"),
-                  ("top", r"верх\w*|\btop\b"), ("bottom", r"нижн\w*|низ\w*|\bbottom\b")]
+                  ("top", r"верх\w*|\btop\b"), ("bottom", r"ниж\w*|низ\w*|\bbottom\b")]
     tokens = []
     for side, pat in side_words:
         tokens += [(m.start(), "side", side) for m in re.finditer(pat, frag.lower())]
@@ -179,6 +218,19 @@ def margin_values(frag):
         tokens.append((m.start(), "value", v))
     tokens.sort()
     result, pending = {}, []
+    if tokens and tokens[0][1] == "value":
+        # "2.5 cm top/bottom, 3 cm left": sides come after their value
+        for i, (_, kind, val) in enumerate(tokens):
+            if kind != "value":
+                continue
+            sides = []
+            for _, k2, v2 in tokens[i + 1:]:
+                if k2 != "side":
+                    break
+                sides.append(v2)
+            for s in sides or (["left", "right", "top", "bottom"] if not result else []):
+                result.setdefault(s, round(val, 1))
+        return result
     for _, kind, val in tokens:
         if kind == "side":
             pending.append(val)
@@ -207,6 +259,7 @@ class Contract:
 
 def parse_fragment(frag, c):
     low = norm(frag).lower()
+    qfrag = numberize(frag)
     exts = exts_in(frag)
     doc_exts = [e for e in exts if e != "zip"]
     target = doc_exts[0] if len(doc_exts) == 1 else (c.primary if not doc_exts else None)
@@ -229,7 +282,8 @@ def parse_fragment(frag, c):
 
     # File name
     if re.search(r"назов|назвать|назван\w* файл|имя файла|имени файла|ім'?я файлу|назв\w* файл|file ?name|"
-                 r"name (?:the|your) file|\bnamed\b|называться|називатися|назвіть", low):
+                 r"name (?:the|your) file|\bnamed\b|называться|називатися|назвіть|save (?:it|the file|your file|"
+                 r"your work)? ?as|сохрани\w* (?:его |файл )?как|збереж\w* (?:його |файл )?як", low):
         cands = quoted(frag) or re.findall(r"[\w\-<>\[\]{}]+\.(?:pdf|docx|pptx|xlsx|zip)", frag, re.I)
         cands = cands or re.findall(r"[\w<>\[\]{}]+(?:[_\-][\w<>\[\]{}]+)+", frag)
         if cands:
@@ -238,31 +292,31 @@ def parse_fragment(frag, c):
             c.add(frag, "filename", ext.group(1).lower() if ext else target, pattern=pat, regex=name_regex(pat))
 
     # Size limit
-    q = quantity(frag, U_MB, default="max")
+    q = quantity(qfrag, U_MB, default="max")
     if q:
         size_target = "zip" if "zip" in exts and not doc_exts else (doc_exts[0] if len(doc_exts) == 1 else None)
         c.add(frag, "max_size_mb", size_target, max=q[1] if q[1] is not None else q[0])
 
     # Slides / pages / words / images / sheets
-    q = quantity(frag, U_SLIDES)
+    q = quantity(qfrag, U_SLIDES)
     if q:
         c.add(frag, "slides", "pptx", min=q[0], max=q[1])
     sheet_context = bool(target == "xlsx" or "xlsx" in exts or re.search(r"таблиц\w*|spreadsheet|workbook", low)
                          or (quoted(frag) and re.search(U_SHEETS, low)))
-    q = quantity(frag, U_PAGES) or (None if sheet_context else quantity(frag, r"\bлист(?:ов|а)?\b"))
+    q = quantity(qfrag, U_PAGES) or (None if sheet_context else quantity(qfrag, r"\bлист(?:ов|а)?\b"))
     if q and not re.search(U_SLIDES, low):
         c.add(frag, "slides" if target == "pptx" else "pages", target, min=q[0], max=q[1])
     if not re.search(r"ключев\w* слов|ключов\w* слів|keywords?", low):
-        q = quantity(frag, U_WORDS, default="about")
+        q = quantity(qfrag, U_WORDS, default="about")
         if q:
             c.add(frag, "words", target, min=q[0], max=q[1])
-    q = quantity(frag, U_IMAGES, default="min")
+    q = quantity(qfrag, U_IMAGES, default="min")
     if q:
         c.add(frag, "images", target, min=q[0], max=q[1])
     if re.search(U_SHEETS, low) and sheet_context:
         names = quoted(frag) or (listed(frag) if re.search(r"(?:лист\w*|аркуш\w*|sheets?|вкладк\w*|tabs?)\s*:",
                                                            low) else [])
-        q = quantity(frag, U_SHEETS, default="min")
+        q = quantity(qfrag, U_SHEETS, default="min")
         c.add(frag, "sheets", "xlsx", names=names or None, min=q[0] if q and not names else None)
 
     # Sections and required phrases
@@ -273,6 +327,12 @@ def parse_fragment(frag, c):
                              r"має бути|must (?:have|be)", low)
     if section_cue:
         items = quoted(frag) or listed(frag)
+        if not items:
+            m = re.search(r"(?:include|includes|contain|contains|have|содерж\w*|включ\w*|містит\w*|включат\w*)\s+"
+                          r"(.+?)\s+(?:sections?|chapters?|розділ\w*|раздел\w*)\b", frag, re.I)
+            if m:
+                items = [re.sub(r"^(?:an?|the)\s+", "", x.strip(), flags=re.I)
+                         for x in re.split(r",|\s+(?:and|и|і|та)\s+", m.group(1)) if x.strip()]
         if items:
             c.add(frag, "sections", target, items=items)
     elif contains_cue and quoted(frag):
@@ -280,15 +340,20 @@ def parse_fragment(frag, c):
 
     # Typography and page setup
     fonts = [f for f in KNOWN_FONTS if re.search(r"\b" + re.escape(f.lower()) + r"\b", low)]
+    if not fonts and re.search(r"\btnr\b", low):
+        fonts = ["Times New Roman"]
     if fonts and not re.search(r"\barial\b.*\btimes\b.*\bили\b", low):
         c.add(frag, "font", target, name=fonts[0])
     fs = re.search(r"(\d+(?:[.,]\d+)?)\s*(?:пт\b|pt\b|пунктов|пункт\w*|points?\b)", low) or \
         re.search(r"(?:кегл\w*|размер\w* шрифта|розмір\w* шрифту|font size|font-size|шрифт\w*[^\d,.;]{0,25})\D{0,12}?"
                   r"(?<![a-zа-я])(\d{1,2}(?:[.,]5)?)(?![\d.,]*\s*(?:мм|см|mm|cm|%|слов|стр|сторін|page|слайд|slide))",
                   low)
+    fs = fs or re.search(r"(?:" + "|".join(re.escape(f.lower()) for f in KNOWN_FONTS) + r"|\btnr)\s*,?\s*"
+                         r"(\d{1,2}(?:[.,]5)?)(?![\d.,]*\s*(?:мм|см|mm|cm|%))\b", low)
     if fs:
         c.add(frag, "font_size", target, value=to_number(fs.group(1)))
-    if re.search(r"\bпол[ея]\b|\bполей\b|відступ\w*|\bберег\w*|\bполя\w*|margins?", low):
+    if re.search(r"\bпол[ея]\b|\bполей\b|відступ\w* від кра\w*|\bберег\w*|\bполя\w*|margins?", low) \
+            and not re.search(r"абзац", low):
         mv = margin_values(frag)
         if mv:
             c.add(frag, "margins", target, **{k: mv[k] for k in mv})
@@ -309,9 +374,9 @@ def parse_fragment(frag, c):
             and re.search(negation, low):
         c.add(frag, "no_tracked_changes", target)
     if re.search(r"заглуш\w*|lorem|placeholder\w*|шаблонн\w* текст|незаполненн\w*|незаповнен\w*|\btodo\b|"
-                 r"template text|рыб\w* текст|пуст\w* пол|порожн\w* пол", low):
+                 r"template text|рыб\w*|пуст\w* пол|порожн\w* пол|dummy text|filler text", low):
         c.add(frag, "no_placeholders", target)
-    if re.search(r"(?:ошиб\w*|помил\w*) (?:в|у) формул|#ref|#div|#знач|formula errors|errors in (?:the )?formulas|"
+    if re.search(r"(?:ошиб\w*|помил\w*) (?:в|у) формул|#ref|#div|#знач|#дел|#ссыл|#имя|#н/д|#value|#name|#n/a|formula errors|errors in (?:the )?formulas|"
                  r"формул\w*[^.]{0,20}без (?:ошиб|помил)|без (?:ошиб|помил)\w*[^.]{0,20}формул|"
                  r"формул\w*[^.]{0,30}(?:коррект|корект|correct)|(?:ошиб|помил)\w* (?:вычислен|обчислен)|"
                  r"formulas?[^.]{0,30}(?:no errors|without errors|error[- ]free)|"
@@ -322,7 +387,8 @@ def parse_fragment(frag, c):
         c.add(frag, "zip_clean", "zip")
 
     produced = len(c.items) > before
-    if (not produced and CUE.search(frag)) or SUBJECTIVE.search(frag):
+    understood_nothing = not produced and not CONTEXT.match(frag) and not HEADING.match(frag)
+    if understood_nothing or SUBJECTIVE.search(frag):
         c.add(frag, "unverified", None, reason="not an objective file property the checker understands")
 
 

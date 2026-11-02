@@ -22,6 +22,7 @@ PLACEHOLDER_RE = re.compile(
 ZIP_JUNK_RE = re.compile(r"(^|/)(__MACOSX/|\.DS_Store$|Thumbs\.db$|desktop\.ini$|~\$|\._)", re.I)
 FORMULA_ERRORS = {"#REF!", "#DIV/0!", "#VALUE!", "#NAME?", "#N/A", "#NUM!", "#NULL!", "#SPILL!", "#CALC!"}
 DOC_EXTS = {"pdf", "docx", "pptx", "xlsx"}
+IMAGE_RE = re.compile(r"\.(png|jpe?g|gif|bmp|tiff?|emf|wmf|svg|webp|heic)$", re.I)  # not embedded .bin/OLE
 
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
 
@@ -76,6 +77,10 @@ def read_pdf(path):
             f["paper"], f["orientation"] = paper(w, h)
     f["text"] = "\n".join(texts)
     f["words"] = count_words(f["text"])
+    if f["pages"] and not fonts:
+        # Pages but no text layer: a scan or text turned into outlines. Text facts are unknown, not zero.
+        f["text"], f["words"] = None, None
+        f["no_text_layer"] = True
     f["main_font"] = main_value(fonts) if fonts else None
     f["main_font_size"] = main_value(sizes) if sizes else None
     f["images"] = images
@@ -135,7 +140,7 @@ def read_docx(path):
             default_font = _theme_minor_font(z)
         app = z.read("docProps/app.xml").decode("utf-8", "replace") if "docProps/app.xml" in names else ""
         comments_xml = z.read("word/comments.xml").decode("utf-8", "replace") if "word/comments.xml" in names else ""
-        f["images"] = sum(1 for n in names if n.startswith("word/media/"))
+        f["images"] = sum(1 for n in names if n.startswith("word/media/") and IMAGE_RE.search(n))
     f["comments"] = len(re.findall(r"<w:comment ", comments_xml))
     f["tracked_changes"] = len(re.findall(r"<w:(?:ins|del|moveFrom|moveTo) ", body))
 
@@ -299,7 +304,7 @@ def read_file(path, name=None):
         except Exception as e:  # a broken file is a finding, not a crash
             f["error"] = f"cannot read: {type(e).__name__}: {e}"
     if "text" in f:
-        f["placeholders"] = placeholders(f["text"])
+        f["placeholders"] = placeholders(f["text"]) if f["text"] is not None else None
     return f
 
 
@@ -320,9 +325,15 @@ def read_zip(path, depth=0):
                 if not os.path.abspath(target).startswith(os.path.abspath(tmp)):
                     continue  # path traversal attempt
                 os.makedirs(os.path.dirname(target), exist_ok=True)
-                with z.open(i) as src, open(target, "wb") as dst:
-                    shutil.copyfileobj(src, dst)
                 label = f"{f['name']}/{i.filename}"
+                try:
+                    with z.open(i) as src, open(target, "wb") as dst:
+                        shutil.copyfileobj(src, dst)
+                except Exception as e:  # password-protected or damaged entry
+                    ext = os.path.splitext(i.filename)[1].lower().lstrip(".")
+                    inner.append({"name": label, "ext": ext, "size_bytes": i.file_size, "in_zip": f["name"],
+                                  "error": f"cannot extract: {e}"})
+                    continue
                 if target.lower().endswith(".zip") and depth < 2:
                     sub = read_zip(target, depth + 1)
                     sub["name"] = label

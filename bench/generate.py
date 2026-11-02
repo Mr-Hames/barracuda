@@ -378,8 +378,10 @@ def build_pdf(rnd, m, path, tmp):
         rect = pymupdf.Rect(60, y, w - 60, h - 60)
         text = "\n".join(lines + [bodies[i]])
         rc = page.insert_textbox(rect, text, fontname="F0", fontsize=m["size"])
-        if rc < 0:  # did not fit: shrink nothing, just use a taller box with the same size
-            page.insert_textbox(pymupdf.Rect(30, 30, w - 30, h - 10), text, fontname="F0", fontsize=m["size"])
+        if rc < 0:  # did not fit: try a bigger box with the same font size
+            rc = page.insert_textbox(pymupdf.Rect(30, 30, w - 30, h - 10), text, fontname="F0", fontsize=m["size"])
+        if rc < 0:
+            raise Overflow("text does not fit on the page")  # build_case re-plans the case
         if images > 0:
             img = png(rnd, os.path.join(tmp, f"i{i}.png"))
             page.insert_image(pymupdf.Rect(w - 160, h - 120, w - 60, h - 60), filename=img)
@@ -516,8 +518,21 @@ def add_zip_part(path, name, data):
 BUILDERS = {"pdf": build_pdf, "docx": build_docx, "pptx": build_pptx, "xlsx": build_xlsx}
 
 
+class Overflow(Exception):
+    pass
+
+
 def build_case(idx, seed, out):
-    rnd = random.Random(seed * 1000 + idx)
+    """Plans that can't be built (more words than the pages hold) are re-planned with another draw."""
+    for attempt in range(20):
+        try:
+            return _build_case(idx, seed, out, random.Random(seed * 1000 + idx + attempt * 100003))
+        except Overflow:
+            continue
+    raise RuntimeError(f"case {idx + 1}: no buildable plan")
+
+
+def _build_case(idx, seed, out, rnd):
     plan = plan_case(rnd, idx)
     m = content_model(rnd, plan)
     lang, primary = plan["lang"], plan["primary"]

@@ -289,4 +289,6 @@ def check(contract, files):
                         "status": "fail", "evidence": [f"{f['name']}: {f['error']}" for f in unreadable]})
     counts = {s: sum(1 for r in results if r["status"] == s) for s in ("pass", "fail", "unverified")}
     verdict = "fail" if counts["fail"] else "incomplete" if counts["unverified"] else "pass"
+    if verdict == "pass" and not contract:
+        verdict = "incomplete"  # no requirements found: nothing was confirmed, so it's not "ready"
     return {"verdict": verdict, "counts": counts, "results": results}

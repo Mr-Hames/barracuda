@@ -10,14 +10,17 @@ Checks: required formats, allowed formats only, file name pattern, file size, pa
 
 Criterion to continue: on 50 prepared assignments with file sets, detect ≥ 90% of labelled objective violations and never report an unverifiable requirement as met.
 
-| benchmark | cases | planted violations | detected | unverifiable reported as met | false alarms |
-|---|---|---|---|---|---|
-| seed 7 | 50 | 94 | 100% | 0 of 71 | 0 of 338 |
-| seed 2026 | 50 | 96 | 100% | 0 of 75 | 0 of 321 |
+| test | size | result |
+|---|---|---|
+| Synthetic benchmark, 12 seeds | 600 assignments, 1195 planted violations | 100% detected, 0 unverifiable reported as met, 0 false alarms |
+| Unseen real-life phrasings, batch 1 | 50 sentences | 66% on first run → 100% after fixes |
+| Unseen real-life phrasings, batch 2 (written after batch 1 fixes) | 40 sentences | **90% on first run** → 100% after fixes |
+| Bad inputs: empty, fake, scanned PDF, encrypted / nested / path-traversal ZIP, empty task | 11 cases | no crashes, no false "met" |
+| Python 3.9, 3.10, 3.11, 3.12, 3.13 | – | same results |
 
-**Read these numbers with care.** The benchmark is synthetic: assignments are generated from phrase templates written by the same author as the parser, so it measures the checker and the file readers well and the understanding of real-world wording optimistically. `tests/test_extract.py` adds 15 phrasings that are not in the generator (13 passed on the first try; the 2 failures were fixed). The honest next step is 50 real assignments with real student or client files, labelled by hand.
+**How to read this.** The synthetic benchmark is generated from phrase templates by the same author as the parser: it proves the file readers and checks, and is optimistic about understanding real wording. The best estimate for unseen wording is the first-run score of batch 2: about **90%** of sentences read correctly. None of the misses produced a false "met"; a miss means a false alarm or a requirement left for manual check. The next step is 50 real assignments with real files, labelled by hand.
 
-Known limits: DOCX page count is only known if Word saved it; margins only from DOCX; fonts from PPTX/XLSX are not read; line spacing, character counts, citation styles, originality, tone and deadlines are always "unverified"; requirements written as number words ("five pages") are not parsed.
+Known limits: DOCX page count only if Word saved it; margins only from DOCX; fonts from PPTX/XLSX not read; line spacing, indents, alignment, page numbers, character counts, citation styles, originality, tone and deadlines are always "needs a human check"; scanned PDFs (no text layer) can't be text-checked.
 
 ## Install
 
@@ -73,6 +76,8 @@ pip install pymupdf pillow                     # only for generating test files
 python bench/generate.py --n 50 --seed 7       # writes bench/cases/ (not in git)
 python bench/evaluate.py                       # recall, false passes, false alarms
 python -m unittest discover tests
+python tests/hard_phrasings.py     # unseen phrasings, batch 1
+python tests/hard_phrasings_2.py   # unseen phrasings, batch 2
 ```
 
 PDF generation uses Windows fonts (Times New Roman, Arial, Calibri).
