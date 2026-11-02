@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif">
+<style>
+.bg{fill:#fff}.t{fill:#0a0b14;font-size:15px;font-weight:600}.s{fill:#5f6375;font-size:13px}.v{fill:#0a0b14;font-size:15px;font-weight:700}
+.track{fill:#eef0f5}.b{fill:#0003fd}.g{fill:#14904a}.h{fill:#0a0b14;font-size:18px;font-weight:700}.line{stroke:#e3e5ee}
+@media (prefers-color-scheme:dark){.bg{fill:#0d1117}.t,.v,.h{fill:#e6edf3}.s{fill:#8b949e}.track{fill:#21262d}.b{fill:#6c7bff}.g{fill:#3fb950}.line{stroke:#30363d}}
+</style>
+<rect class="bg" width="960" height="330" rx="16"/>
+<text class="h" x="32" y="46">How it scored</text>
+<text class="s" x="32" y="70">Measured on version 0.1.0. Rerun it yourself with the commands in "For developers".</text>
+
+<text class="t" x="32" y="118">Planted mistakes found</text>
+<text class="s" x="32" y="138">600 generated assignments, 1,191 mistakes</text>
+<rect class="track" x="380" y="110" width="460" height="22" rx="11"/><rect class="b" x="380" y="110" width="460" height="22" rx="11"/>
+<text class="v" x="856" y="127">100%</text>
+
+<text class="t" x="32" y="186">False alarms</text>
+<text class="s" x="32" y="206">on 5,003 objective requirements</text>
+<rect class="track" x="380" y="178" width="460" height="22" rx="11"/>
+<text class="v" x="856" y="195">0</text>
+
+<text class="t" x="32" y="254">Real phrasings understood, first try</text>
+<text class="s" x="32" y="274">41 sentences written separately, before fixes</text>
+<rect class="track" x="380" y="246" width="460" height="22" rx="11"/><rect class="g" x="380" y="246" width="414" height="22" rx="11"/>
+<text class="v" x="856" y="263">90%</text>
+
+<line class="line" x1="32" x2="928" y1="298" y2="298"/>
+<text class="s" x="32" y="318">Unverifiable requirements reported as met: 0 of 893. Generated cases come from my own templates, so the first two numbers are optimistic.</text>
+</svg>

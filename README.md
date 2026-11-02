@@ -10,6 +10,18 @@ It's a skill for AI coding agents (Claude, Codex, Cursor, GitHub Copilot, Google
 
 It works with PDF, Word (DOCX), PowerPoint (PPTX), Excel (XLSX) and ZIP archives, including files packed inside an archive. Assignments can be written in English, Ukrainian or Russian.
 
+![How Barracuda works: you give the assignment and files, it turns the text into requirements, measures the files and returns a report](assets/how-it-works.svg)
+
+## What you can ask
+
+| You write | What it reads from the assignment | What you get |
+|---|---|---|
+| `Check my coursework against this task` + task.txt, thesis.docx | 15 to 20 pages, Times New Roman 14, left margin 30 mm, sections | Each mismatch with the number it found, e.g. "13 pages (need ≥15)" |
+| `Is this ready to send to the client?` + brief from an email, deck.pptx, offer.pdf | PDF only, at most 10 slides, file name pattern, no comments | Wrong format, extra slides, a forgotten reviewer comment |
+| `Перевір архів перед здачею` + ZIP with the project | Required files, size limit, no junk | `__MACOSX`, `.DS_Store`, a missing file inside the archive |
+| `Проверь таблицу по заданию` + calc.xlsx | Required sheet names, no formula errors | `#DIV/0!` with the exact sheet and cell |
+| `Is the essay original and well argued?` | Nothing objective to measure | An honest "needs a human check", never a fake "met" |
+
 ## Who it's for
 
 Students handing in coursework, where a lecturer asked for 15 to 20 pages in Times New Roman 14 with 3 cm left margin. Freelancers and agencies sending deliverables to a client who wrote the requirements in an email. Anyone who has had work bounced back because of a wrong file name, a forgotten comment or a missing section.
@@ -38,6 +50,11 @@ This is the main rule of the project. If the tool isn't sure, it says so.
 Here is Barracuda checking a marketing assignment with a Word report, a PowerPoint pitch and an Excel sheet. Five mistakes were hidden in the files, and it found all five. This is the real page it produces (`--format html`), not a mock-up. It follows your system's light or dark theme and works on a phone.
 
 ![Example report](assets/example-report.png)
+
+<table><tr>
+<td width="68%"><img src="assets/report-dark.png" alt="The same report in dark mode"></td>
+<td width="32%"><img src="assets/report-phone.png" alt="The same report on a phone"></td>
+</tr><tr><td align="center">Dark mode</td><td align="center">On a phone</td></tr></table>
 
 ## Try it in a minute
 
@@ -101,9 +118,13 @@ Your files never leave your computer. Everything is read locally, and hostile fi
 
 This is a prototype, and here are the numbers as they are.
 
-On 600 generated assignments with 1,195 deliberately planted mistakes, Barracuda found all of them, raised no false alarms and never called an unverifiable requirement "done". Those assignments come from templates I wrote myself, so the score is optimistic about understanding real wording.
+![Results: 100% of 1,191 planted mistakes found, 0 false alarms, 90% of real phrasings understood on the first try](assets/results.svg)
 
-The more honest number comes from 40 real-life phrasings written separately: 90% were understood correctly on the first try. The misses never turned into a false "done". In the worst case the tool raised an extra warning or left a requirement for you to check.
+On 600 generated assignments with 1,191 deliberately planted mistakes, Barracuda found all of them, raised no false alarms and never called any of the 893 unverifiable requirements "done". Those assignments come from templates I wrote myself, so the score is optimistic about understanding real wording.
+
+The more honest number comes from 41 real-life phrasings written separately: 90% were understood correctly on the first try, before I fixed anything. The misses never turned into a false "done". In the worst case the tool raised an extra warning or left a requirement for you to check. Those misses are fixed now and the phrasings run as tests, so they can't come back.
+
+To reproduce the big run: `python bench/generate.py --n 600 --seed 7 --out /tmp/b600 && python bench/evaluate.py --cases /tmp/b600`. CI runs a 50-case version on every commit.
 
 Known limits. A Word file's page count is only known if the file was last saved in Microsoft Word. Margins are read from Word files only. Scanned PDFs can't be checked for text. Formatting standards such as APA or DSTU are not built in yet.
 

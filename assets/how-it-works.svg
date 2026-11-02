@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif">
+<style>
+.bg{fill:#fff}.card{fill:#f6f7fb;stroke:#e3e5ee}.t{fill:#0a0b14;font-size:17px;font-weight:600}.s{fill:#5f6375;font-size:13px}
+.n{fill:#0003fd;font-size:12px;font-weight:700;letter-spacing:.08em}.ar{stroke:#9aa0b4;stroke-width:1.6;fill:none}.ah{fill:#9aa0b4}
+.r{fill:#e5243b}.a{fill:#c27700}.g{fill:#14904a}.code{fill:#0a0b14;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+@media (prefers-color-scheme:dark){.bg{fill:#0d1117}.card{fill:#161b22;stroke:#30363d}.t{fill:#e6edf3}.s{fill:#8b949e}.n{fill:#7c8cff}.code{fill:#e6edf3}.ar{stroke:#6e7681}.ah{fill:#6e7681}}
+</style>
+<rect class="bg" width="960" height="300" rx="16"/>
+<g transform="translate(24,40)">
+<rect class="card" width="200" height="220" rx="14"/>
+<text class="n" x="20" y="34">1 · YOU GIVE</text>
+<text class="t" x="20" y="64">Assignment text</text>
+<text class="s" x="20" y="86">pasted or from a file</text>
+<text class="t" x="20" y="126">Your files</text>
+<text class="s" x="20" y="148">PDF · DOCX · PPTX</text>
+<text class="s" x="20" y="168">XLSX · ZIP</text>
+</g>
+<g transform="translate(260,40)">
+<rect class="card" width="200" height="220" rx="14"/>
+<text class="n" x="20" y="34">2 · IT READS THE TASK</text>
+<text class="t" x="20" y="64">List of requirements</text>
+<text class="code" x="20" y="100">pages  15–20</text>
+<text class="code" x="20" y="122">font   Times New Roman</text>
+<text class="code" x="20" y="144">slides ≤ 10</text>
+<text class="code" x="20" y="166">tone   → human check</text>
+<text class="s" x="20" y="198">rules, not guesses</text>
+</g>
+<g transform="translate(496,40)">
+<rect class="card" width="200" height="220" rx="14"/>
+<text class="n" x="20" y="34">3 · IT OPENS THE FILES</text>
+<text class="t" x="20" y="64">Measures what's there</text>
+<text class="s" x="20" y="100">pages, words, fonts,</text>
+<text class="s" x="20" y="120">margins, sections,</text>
+<text class="s" x="20" y="140">comments, formula errors,</text>
+<text class="s" x="20" y="160">junk in archives</text>
+<text class="s" x="20" y="198">locally, nothing uploaded</text>
+</g>
+<g transform="translate(732,40)">
+<rect class="card" width="204" height="220" rx="14"/>
+<text class="n" x="20" y="34">4 · YOU GET</text>
+<text class="t" x="20" y="64">A report</text>
+<circle class="r" cx="26" cy="100" r="6"/><text class="s" x="40" y="105">Not met, with proof</text>
+<circle class="a" cx="26" cy="132" r="6"/><text class="s" x="40" y="137">Needs a human check</text>
+<circle class="g" cx="26" cy="164" r="6"/><text class="s" x="40" y="169">Met</text>
+<text class="s" x="20" y="198">text, HTML or JSON</text>
+</g>
+<g><path class="ar" d="M228 150h26"/><path class="ah" d="M256 150l-7-5v10z"/>
+<path class="ar" d="M464 150h26"/><path class="ah" d="M492 150l-7-5v10z"/>
+<path class="ar" d="M700 150h26"/><path class="ah" d="M728 150l-7-5v10z"/></g>
+</svg>
