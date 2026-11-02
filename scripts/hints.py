@@ -160,9 +160,9 @@ def hint(r, lang="en"):
         example = re.sub(r"<[^>]+>", EXAMPLE_NAME.get(lang, "Smith"), r.get("pattern") or "")
         return H["filename"].format(example=example) if example else None
     if t == "font":
-        return H["font"].format(name=r.get("name", ""))
+        return H["font"].format(name=r["name"]) if r.get("name") else None
     if t == "font_size":
-        return H["font_size"].format(value=f"{r.get('value', 0):g}")
+        return H["font_size"].format(value=f"{r['value']:g}") if isinstance(r.get("value"), (int, float)) else None
     if t == "file_required":
         return H["file_required"].format(target=r.get("target") or "")
     return H.get(t)

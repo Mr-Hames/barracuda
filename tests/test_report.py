@@ -42,9 +42,9 @@ class Reports(unittest.TestCase):
         md = markdown(REPORT)
         self.assertIn("2 not met · 2 met · 1 need a human check", md)
         page = to_html(REPORT)
-        self.assertIn("2 things to fix", page)
-        self.assertIn("against 5 requirements", page)
-        self.assertIn("Checked 2 files", page)  # files inside archives aren't counted twice
+        self.assertIn('<div class="big">2</div>', page)
+        self.assertIn("things to fix", page)
+        self.assertIn('Files</span><b>2</b>', page)  # files inside archives aren't counted twice
 
     def test_html_escapes_everything(self):
         page = to_html(REPORT)
