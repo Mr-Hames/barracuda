@@ -1,7 +1,7 @@
 [project]
 name = "barracuda-guard"
 version = "0.1.0"
-description = "Check PDF, DOCX, PPTX, XLSX and ZIP deliverables against a plain-text assignment. Unverifiable requirements are never reported as met."
+description = "Checks PDF, Word, PowerPoint, Excel and ZIP files against an assignment before you hand them in. Never says \"done\" for what it can't check."
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Mr.Hames" }]
