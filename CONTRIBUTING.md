@@ -19,7 +19,7 @@ Open an issue at https://github.com/Mr-Hames/barracuda/issues. The most useful r
    python tests/hard_phrasings_2.py
    python bench/generate.py --n 50 --seed 7 && python bench/evaluate.py   # Windows only (uses Windows fonts)
    ```
-5. Open a pull request describing what changed and why. CI runs the same checks on Windows, macOS and Linux.
+5. Open a pull request describing what changed and why. CI runs the checks on Windows and Linux for every change, and on macOS every week.
 
 ## Rules for changes
 

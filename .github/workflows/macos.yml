@@ -1,18 +1,16 @@
 name: macos
 
-# Kept apart from "tests": macOS runners sometimes sit in GitHub's queue until they time out,
-# and that says nothing about the code.
+# Kept apart from "tests" and off the commit checks: macOS runners sometimes sit in GitHub's
+# queue until they time out, and that says nothing about the code. Runs weekly and on demand.
 
 on:
-  push:
-    branches: [master]
-  pull_request:
+  workflow_dispatch:
   schedule:
     - cron: "0 6 * * 1"
 
 jobs:
   tests:
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
