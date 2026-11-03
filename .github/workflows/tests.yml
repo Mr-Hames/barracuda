@@ -24,6 +24,8 @@ jobs:
         exclude:
           - os: ubuntu-latest  # the newest Ubuntu image has no Python 3.9 build
             python: "3.9"
+          - os: macos-latest  # Python 3.9 jobs on macOS runners keep timing out in the queue; 3.9 is covered on Linux and Windows
+            python: "3.9"
         include:
           - os: ubuntu-24.04
             python: "3.9"
