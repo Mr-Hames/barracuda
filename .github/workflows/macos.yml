@@ -1,0 +1,29 @@
+name: macos
+
+# Kept apart from "tests": macOS runners sometimes sit in GitHub's queue until they time out,
+# and that says nothing about the code.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  tests:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install pymupdf pillow
+      - name: Self-test
+        run: python scripts/guard.py --selftest
+      - name: Unit and stress tests
+        run: python -m unittest discover tests -v
